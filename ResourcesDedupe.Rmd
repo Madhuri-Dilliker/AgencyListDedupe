@@ -5,6 +5,7 @@ output: html_notebook
 
 ```{r libraries, include=FALSE}
 library(tidyverse)
+library(dplyr)
 ```
 
 
@@ -44,7 +45,12 @@ Step1: shorten dataframes into only the necessary columns for the dedupe of orgs
 ```{r}
 covid_res.df <- select(covid_res, CSheetID, Org, 'Program Name', 'Street Address', City, Zip )
 
-covid_res.df <- rename(covid_res.df, c('ID' = 'CSheetID', 'Org' = 'Org', 'Program' = 'Program Name','Street' ='Street Address'))
+#covid_res.df <- rename(covid_res.df, c('ID' = 'CSheetID', 'Org' = 'Org', 'Program' = 'Program Name','Street' ='Street Address', 'City'= 'City', 'Zip'= 'Zip'))
+```
+
+
+```{r}
+covid_res.df <- rename(covid_res.df, 'ID' = 'CSheetID', 'Org' = 'Org', 'Program' = 'Program Name','Street' ='Street Address', 'City'= 'City', 'Zip'= 'Zip')
 ```
 
 
@@ -53,7 +59,7 @@ covid_res.df <- rename(covid_res.df, c('ID' = 'CSheetID', 'Org' = 'Org', 'Progra
 ```{r}
 resources.df <- select(resources, MSheetID, `Organization Name`, 'Program Name', 'Street Address', City, Zip)
 
-resources.df<- rename(resources.df, c('ID' = 'MSheetID', 'Org' = 'Organization Name', 'Program' = 'Program Name', 'Street' = 'Street Address' ))
+resources.df<- rename(resources.df, 'ID' = 'MSheetID', 'Org' = 'Organization Name', 'Program' = 'Program Name', 'Street' = 'Street Address')
 ```
 
 
@@ -113,6 +119,7 @@ resources.Clustered <- left_join(resources.Clustered, cluster_join, by= c('MShee
 #relocate joined cluster column to position 2
 resources.Clustered <- resources.Clustered %>% 
   relocate(cluster_id, .after = MSheetID)
+#moving column from one position to other
 ```
 
 ```{r}
