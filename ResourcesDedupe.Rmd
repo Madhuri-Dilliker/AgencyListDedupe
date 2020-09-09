@@ -48,12 +48,13 @@ covid_res.df <- select(covid_res, CSheetID, Org, 'Program Name', 'Street Address
 #covid_res.df <- rename(covid_res.df, c('ID' = 'CSheetID', 'Org' = 'Org', 'Program' = 'Program Name','Street' ='Street Address', 'City'= 'City', 'Zip'= 'Zip'))
 ```
 
+Renaming some of the column names in covid resource dataframe
 
 ```{r}
 covid_res.df <- rename(covid_res.df, 'ID' = 'CSheetID', 'Org' = 'Org', 'Program' = 'Program Name','Street' ='Street Address', 'City'= 'City', 'Zip'= 'Zip')
 ```
 
-
+Renaming some of the column names in resource dataframe
 
 
 ```{r}
@@ -63,36 +64,29 @@ resources.df<- rename(resources.df, 'ID' = 'MSheetID', 'Org' = 'Organization Nam
 ```
 
 
-Step2: combine table rows
+Step2: combine table rows from both dataframes
 
 ```{r}
 comb_res <- bind_rows( covid_res.df, resources.df)
 ```
 
-Replace error with zip endding in '.0'
+Replace error with zip ending in '.0'
 
 ```{r}
 comb_res <- comb_res %>% 
   mutate(Zip= str_remove(Zip, "\\.0"))
 ```
 
-
-
-
 export file out
 ```{r}
 #write_csv(comb_res, "data/comb_res.csv")
 ```
-
-
 
 import clusters from dedupe Step
 
 ```{r}
 program_clusters <- read_csv("data/Org Resource List.csv")
 ```
-
-
 
 Add Cluster Ids to resource columns
 ```{r}
@@ -106,13 +100,13 @@ covid_res.clustered <- covid_res
 
 
 
-create joining table
+create joining table with cluster_id and id
 ```{r}
 cluster_join <- select(program_clusters, cluster_id, id)
 ```
 
 
-left joins
+left join on resources.Clustered and cluster_join by MSheetID and Id
 ```{r}
 resources.Clustered <- left_join(resources.Clustered, cluster_join, by= c('MSheetID'= 'id'))
 
@@ -121,6 +115,8 @@ resources.Clustered <- resources.Clustered %>%
   relocate(cluster_id, .after = MSheetID)
 #moving column from one position to other
 ```
+
+left join on resources.Clustered and cluster_join by CSheetID and Id
 
 ```{r}
 covid_res.clustered<- left_join(covid_res.clustered, cluster_join, by = c("CSheetID"='id'))
@@ -134,17 +130,19 @@ covid_res.clustered <- covid_res.clustered %>%
 
 
 
-Count number of distinct programs
+Count number of distinct programs in cluster_join dataframe 
 ```{r}
 n_distinct(cluster_join$cluster_id)
 
 ```
+Count number of distinct programs in covid_res.clustered dataframe  and resources.Clustered dataframe
 
 ```{r}
 n_distinct(covid_res.clustered$cluster_id)
 
 n_distinct(resources.Clustered$cluster_id)
 ```
+
 
 ```{r}
 covid.unique<- as_tibble(  unique(covid_res.clustered$cluster_id))
