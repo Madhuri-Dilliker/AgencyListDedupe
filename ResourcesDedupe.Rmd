@@ -143,29 +143,32 @@ n_distinct(covid_res.clustered$cluster_id)
 n_distinct(resources.Clustered$cluster_id)
 ```
 
-
+convert to tibble and make sure names are unique and not empty for cluster_id in  covid_res.clustered and resources.Clustered dataframes.
 ```{r}
 covid.unique<- as_tibble(  unique(covid_res.clustered$cluster_id))
 
 resources.unique <- as_tibble(unique(resources.Clustered$cluster_id))
 ```
 
-
+using anti_join to join covid.unique and resources.unique  based on common id in respective dataframe
 ```{r}
 nonJoinCR <- anti_join(covid.unique, resources.unique)
 
 nonJoinRC <- anti_join(resources.unique, covid.unique)
 ```
 
-
+filter covid_res.clustered dataframe based on cluster_id present in nonJoinCR daatframe value column
 ```{r}
 explore_covid <-filter(covid_res.clustered, cluster_id %in% nonJoinCR$value)
 ```
+
+filter resources.Clustered based on cluster_id present in nonJoinRC daatframe value column
 
 ```{r}
 explore_res <- filter(resources.Clustered, cluster_id %in% nonJoinRC$value)
 ```
 
+filtering explore_covid dataframe with org not equal to Guilford County Schools
 
 ```{r}
 programs_add <-filter(explore_covid, Org != 'Guilford County Schools')
