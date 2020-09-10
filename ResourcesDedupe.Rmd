@@ -186,6 +186,8 @@ Extract Service types from that unique list as well.
 
 First exact subset of columns to combine from both lists. 
 
+Creating a subset of resource list with resources.Clustered dataframe,cluster_id, Program Name and Organization Name columns. Then renamed the org column to organization Name
+
 ```{r}
 # subset of resources list
 resource.comb <- select(
@@ -199,9 +201,10 @@ resource.comb <- rename(resource.comb, 'Org' ='Organization Name')
 
 ```
 
-
+Create a subset for covid list with covid_res.clustered dataframe,cluster_id, Program Name and Org column
 
 ```{r}
+#subset of covid list
 covid.comb <- select(
   covid_res.clustered,
   cluster_id,
@@ -210,6 +213,7 @@ covid.comb <- select(
 )
 ```
 
+Filtering the subset covid.comb with those cluster_id which are inprograms_add dataframe
 
 ```{r}
 #filter covid.comb to just the programs to add
@@ -220,18 +224,15 @@ covid.comb.add <-filter(
 
 ```
 
-
-
-
-
+Combining rows for resource.comb and covid.comb.add dataframes
 
 ```{r}
 # combine sublist together
 Master_Resource_List <- bind_rows(resource.comb, covid.comb.add)
 ```
 
-
 Function to add all appearances.
+This function takes in cluster_id and filters cluster_id present in cluster_join and represent it as vectors/list which is comma seperated.
 ```{r}
 appearances_list<- function(clustId){
   clusters = cluster_join
@@ -249,8 +250,9 @@ appearances_list<- function(clustId){
 appearances_list_vector <- Vectorize(appearances_list)
 ```
 
-
 sanity check
+1] Testing the count in cluster_join dataframe
+2]filter the given cluster_id 
 ```{r}
 test.clusters<-count(cluster_join, cluster_id)
 
@@ -258,15 +260,14 @@ test2 <- filter(cluster_join, cluster_id =='ae0abbbc-a00d-4d21-ac6a-73764881e9b8
 
 ```
 
-
+Testing the appearances_list function
 
 ```{r}
+#testing the function
 appearances_list('ae0abbbc-a00d-4d21-ac6a-73764881e9b8')
 ```
 Passed sanity check
-
-
-
+Now combining the data obtained from appearances_list function to Master_Resource_List
 ```{r}
 #combine apperances in master list
 Master_Resource_List<- Master_Resource_List %>% 
@@ -274,7 +275,7 @@ Master_Resource_List<- Master_Resource_List %>%
 
 ```
 
-
+Master_Resource_List is grouped by cluster_id with first instance for Program Name, Org and Sources column, this helps to remove the duplicates.
 
 ```{r}
 #remove duplicates and grad first instance only
@@ -285,7 +286,7 @@ Master_Resource_List <- Master_Resource_List %>%
             sources= first(sources))
 ```
 
-
+In Master_Resource_List for source column string counting the number of sources from resource list and covid list 
 
 ```{r}
 # count the number of sources
@@ -297,13 +298,12 @@ Master_Resource_List <-Master_Resource_List %>%
 
 ```
 
-
+Creating a new dataframe named as Master_Resource_List.test with number of sources equal to 2
 
 ```{r}
 Master_Resource_List.test<- Master_Resource_List %>% 
   filter(n_sources==2)
 ```
-
 
 Add addresses to programs to aide in Org dedupe
 
@@ -316,6 +316,8 @@ resources.Addresses <- resources.Clustered %>%
 ```
 
 Ensure only one cluster in the resources.
+Creating a vector with M_n_sources from Master_Resource_List dataframe is greater than 1
+Storing cluster_id in Remove_values vectors for result obtained from filtering M_n_sources greater than 1
 ```{r}
 Remove_values <- Master_Resource_List %>% 
   filter(M_n_sources>1)
@@ -323,24 +325,18 @@ Remove_values <- Master_Resource_List %>%
 Remove_values<- Remove_values$cluster_id
 ```
 
+Filtering those addresses from resources.Addresses daatframe which are not present in Remove_values list
+
 ```{r}
 resources.Addresses <- resources.Addresses %>% 
   filter(!cluster_id %in% Remove_values)
 ```
 
-
-
-
 left join of the data sets with Master_List
-
-
+Left join Master_Resource_List and resources.Addresses dataframe based on cluster_id
 ```{r}
 Master_Resource_List <- left_join(Master_Resource_List, resources.Addresses, by= "cluster_id")
 ```
-
-
-
-
 
 Rename cluster_id because we will run this though a second dedupe
 
@@ -349,26 +345,11 @@ Master_Resource_List <- Master_Resource_List %>%
   rename('cluster_id_program' = 'cluster_id')
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-Creat list of Orgs from Master List
+Create list of Orgs from Master List
 
 ```{r}
 #write_csv(Master_Resource_List, "data/Master_Resource_list.csv")
 ```
-
-
 
 import Orgs clustered
 ```{r}
@@ -379,9 +360,8 @@ Org_master_list<- Org_master_list %>%
   rename('cluster_id_Org'='cluster_id')
 ```
 
-
 Dedupe Org List
-
+In Org_master_list.Dedupe grouping the data from Org_master_list dataframe based on cluster_id_Org column
 ```{r}
 Org_master_list.Dedupe <- Org_master_list %>% 
   group_by(cluster_id_Org) %>% 
@@ -392,6 +372,8 @@ Org_master_list.Dedupe <- Org_master_list %>%
             n_sources= first(n_sources))
 
 ```
+
+In na_Org_addresses dataframe storing the data from Org_master_list.Dedupe with street_address which are present or which do not contain NA values
 
 ```{r}
 na_Org_addresses<- Org_master_list.Dedupe %>% 
