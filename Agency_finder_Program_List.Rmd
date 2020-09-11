@@ -9,13 +9,14 @@ library(tidyverse)
 library(dplyr)
 ```
 
-Loading Program List
+#Loading Program List
 
 ```{r}
 Program_list <- read_excel("C:/Users/madhu/OneDrive/Documents/Ready for school, ready for life/AgencyListDedupe/program_list.xlsx")
 
 ```
-Creating a new dataframe Master_Program_List and selecting some of the columns from Program_list Dataframe
+
+#Creating a new dataframe Master_Program_List and selecting some of the columns from Program_list Dataframe
 
 ```{r}
 
@@ -23,40 +24,43 @@ Master_Program_List <- select(Program_list,cluster_id_program,Program_Name,clust
 
 ```
 
-Creating a new dataframe Master_Location_List and selecting some of the columns from Program_list Dataframe
+#Creating a new dataframe Master_Location_List and selecting some of the columns from Program_list Dataframe
 
 ```{r}
 Master_Location_List <- select(Program_list,cluster_id_program,Program_Name,'Location Eligibility','Street Address.x','City.x','Zip.x','Phone Number','Fax Number','Email address',Website,'Mon- Hours','Tues-Hours','Wed-Hours','Thurs-Hours','Fri-Hours','Sat-Hours','Sun-Hours',)
 ```
-Removing .0 from zip column in Master_Location_List dataframe
+#Removing .0 from zip column in Master_Location_List dataframe
 
 ```{r}
 Master_Location_List <- Master_Location_List %>% 
   mutate(Zip.x= str_remove(Zip.x, "\\.0"))
 ```
-Creating a new dataframe Master_Service_Type and selecting some of the columns from Program_list Dataframe
+
+#Creating a new dataframe Master_Service_Type and selecting some of the columns from Program_list Dataframe
 
 ```{r}
 Master_Service_Type <-select(Program_list,cluster_id_program,'Service Factor','Service Type 1','Service Type 2')
 ```
 
-Loading writexl to extract excel sheet from R studio
+#Loading writexl to extract excel sheet from R studio
 
 ```{r}
 library("writexl")
 ```
-Extracting Master_Program_List dataframe 
+
+#Extracting Master_Program_List dataframe 
 
 ```{r}
 write_xlsx(Master_Program_List,"C:/Users/madhu/OneDrive/Documents/Ready for school, ready for life/AgencyListDedupe/Master_Program_List.xlsx")
 ```
-Extracting Master_Location_List dataframe 
+
+#Extracting Master_Location_List dataframe 
 
 ```{r}
 write_xlsx(Master_Location_List,"C:/Users/madhu/OneDrive/Documents/Ready for school, ready for life/AgencyListDedupe/Master_Location_List.xlsx")
 ```
 
-Extracting Master_Service_Type dataframe 
+#Extracting Master_Service_Type dataframe 
 
 ```{r}
 write_xlsx(Master_Service_Type,"C:/Users/madhu/OneDrive/Documents/Ready for school, ready for life/AgencyListDedupe/Master_Service_Type.xlsx")
