@@ -1,0 +1,52 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+library("readxl")
+library(tidyverse)
+library(dplyr)
+```
+
+```{r}
+Program_list <- read_excel("C:/Users/madhu/OneDrive/Documents/Ready for school, ready for life/AgencyListDedupe/program_list.xlsx")
+
+```
+
+```{r}
+
+Master_Program_List <- select(Program_list,cluster_id_program,Program_Name,cluster_id_Org,Org,'Primary Program Contact Name','Duplication Policy','Transportation Policy','Brief Program Description','Services Provided in other languages','Specify Languages','Services Offered','Age Range for Services','Specific Eligibility Criteria','Duration/Length of Service','Evidence Based','Validated Screening Tools','Fees','Contact Name for Referrals','Accepted Referral Process','Preferred Referral','Referral Form Provided','Referral Source Response Time','Practice for Following Up with Referring Organization' )
+
+```
+
+
+```{r}
+Master_Location_List <- select(Program_list,cluster_id_program,Program_Name,'Location Eligibility','Street Address.x','City.x','Zip.x','Phone Number','Fax Number','Email address',Website,'Mon- Hours','Tues-Hours','Wed-Hours','Thurs-Hours','Fri-Hours','Sat-Hours','Sun-Hours',)
+```
+
+
+```{r}
+Master_Location_List <- Master_Location_List %>% 
+  mutate(Zip.x= str_remove(Zip.x, "\\.0"))
+```
+
+```{r}
+Master_Service_Type <-select(Program_list,cluster_id_program,'Service Factor','Service Type 1','Service Type 2')
+```
+
+```{r}
+library("writexl")
+```
+
+```{r}
+write_xlsx(Master_Program_List,"C:/Users/madhu/OneDrive/Documents/Ready for school, ready for life/AgencyListDedupe/Master_Program_List.xlsx")
+```
+
+```{r}
+write_xlsx(Master_Location_List,"C:/Users/madhu/OneDrive/Documents/Ready for school, ready for life/AgencyListDedupe/Master_Location_List.xlsx")
+```
+
+```{r}
+write_xlsx(Master_Service_Type,"C:/Users/madhu/OneDrive/Documents/Ready for school, ready for life/AgencyListDedupe/Master_Service_Type.xlsx")
+```
+
